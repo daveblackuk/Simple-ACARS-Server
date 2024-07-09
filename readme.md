@@ -1,7 +1,7 @@
 # SIMPLE ACARS server
 
 * Allows local connectivity testing for clients
-* Supports CDPLC, TELEX, POLL and PEEK message types
+* Supports CDPLC, TELEX, PROGRESS, POSREQ, POSITION, POLL and PEEK message types
 * Based: on [https://www.hoppie.nl/acars/system/tech.html](https://www.hoppie.nl/acars/system/tech.html)
 * Endpoint: http://localhost:5050/acars/system/connect.html
 
