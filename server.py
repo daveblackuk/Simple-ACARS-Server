@@ -67,7 +67,7 @@ def connect():
         )
         db.session.add(new_message)
         db.session.commit()
-        return "OK", 201
+        return "OK", 200
 
     elif message_type == "ping":
          return f"OK", 200
