@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime, timedelta
 
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///acars.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -57,6 +58,10 @@ def connect():
         missing_fields = [field for field in ['logon', 'from', 'to', 'type'] if not data.get(field)]
         return jsonify({"error": "Missing fields", "missing": missing_fields}), 400
 
+    # Normalize fields to uppercase
+    sender = sender.upper()
+    receiver = receiver.upper()
+  
     if message_type in ["cpdlc", "telex", "progress","position","posreq","datareq"]:
         new_message = ACARSMessage(
             logon=logon,
@@ -67,10 +72,10 @@ def connect():
         )
         db.session.add(new_message)
         db.session.commit()
-        return "OK", 200
+        return "ok", 200
 
     elif message_type == "ping":
-         return f"OK", 200
+         return f"ok", 200
     
     elif message_type == "inforeq":
          return f"not implemented", 200
@@ -87,8 +92,8 @@ def connect():
             msg.read = True
             db.session.add(msg)
         db.session.commit()
-
-        return f"OK {formatted_messages}", 200
+        print(f"ok {formatted_messages}")
+        return f"ok {formatted_messages}", 200
 
     elif message_type == "peek":
         # Retrieve messages from the last 24 hours
@@ -99,8 +104,8 @@ def connect():
             f"{{{msg.id} {msg.sender} {msg.message_type} {{{msg.packet}}}}}"
             for msg in messages
         ])
-
-        return f"OK {formatted_messages}", 200
+        print(f"ok {formatted_messages}")
+        return f"ok {formatted_messages}", 200
 
     else:
         return jsonify({"error": "Unsupported message type"}), 400
@@ -136,5 +141,10 @@ def dump():
     """
     return render_template_string(table_html, messages=messages)
 
+
+
+
 if __name__ == '__main__':
+
+    print("0.3")
     app.run(host='0.0.0.0', port=5050, debug=True)
