@@ -40,7 +40,7 @@ def connect():
     else:
         data = request.args
 
-    logon = data.get('logon')
+    logon = " " # data.get('logon')
     sender = data.get('from')
     receiver = data.get('to')
     message_type = data.get('type')
@@ -48,7 +48,7 @@ def connect():
 
     # Logging the received data for debugging
     print("Received data:")
-    print(f"logon: {logon}")
+#    print(f"logon: {logon}")
     print(f"from: {sender}")
     print(f"to: {receiver}")
     print(f"type: {message_type}")
@@ -117,7 +117,6 @@ def dump():
     <table border="1">
         <tr>
             <th>ID</th>
-            <th>Logon</th>
             <th>Sender</th>
             <th>Receiver</th>
             <th>Message Type</th>
@@ -128,7 +127,6 @@ def dump():
         {% for msg in messages %}
         <tr>
             <td>{{ msg.id }}</td>
-            <td>{{ msg.logon }}</td>
             <td>{{ msg.sender }}</td>
             <td>{{ msg.receiver }}</td>
             <td>{{ msg.message_type }}</td>
@@ -146,5 +144,5 @@ def dump():
 
 if __name__ == '__main__':
 
-    print("0.3")
+    print("0.2")
     app.run(host='0.0.0.0', port=5050, debug=True)
