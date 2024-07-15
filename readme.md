@@ -4,6 +4,7 @@
 * Supports CDPLC, TELEX, PROGRESS, POSREQ, POSITION, POLL and PEEK message types
 * Based: on [https://www.hoppie.nl/acars/system/tech.html](https://www.hoppie.nl/acars/system/tech.html)
 * Endpoint: http://localhost:5050/acars/system/connect.html
+* Display the database contents: http://localhost:5050/dump
 
 ## Local Installation
 
@@ -19,7 +20,7 @@
 
 ## CURL Examples
 
-replace 172.17.0.2 with either localhost or your docker container's IP address
+replace  localhost with your docker container's IP address if required
 
 Telex: curl "http://localhost:5050/acars/system/connect.html?logon=gFR54Fr&from=KXXY&to=KLM123&type=telex&packet=hello_world"
 

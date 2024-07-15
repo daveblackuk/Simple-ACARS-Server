@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime, timedelta
@@ -104,6 +104,37 @@ def connect():
 
     else:
         return jsonify({"error": "Unsupported message type"}), 400
+
+@app.route('/dump', methods=['GET'])
+def dump():
+    messages = ACARSMessage.query.all()
+    table_html = """
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Logon</th>
+            <th>Sender</th>
+            <th>Receiver</th>
+            <th>Message Type</th>
+            <th>Packet</th>
+            <th>Timestamp</th>
+            <th>Read</th>
+        </tr>
+        {% for msg in messages %}
+        <tr>
+            <td>{{ msg.id }}</td>
+            <td>{{ msg.logon }}</td>
+            <td>{{ msg.sender }}</td>
+            <td>{{ msg.receiver }}</td>
+            <td>{{ msg.message_type }}</td>
+            <td>{{ msg.packet }}</td>
+            <td>{{ msg.timestamp }}</td>
+            <td>{{ msg.read }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    """
+    return render_template_string(table_html, messages=messages)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5050, debug=True)
