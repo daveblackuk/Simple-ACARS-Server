@@ -97,7 +97,7 @@ def connect():
     elif message_type == "peek":
         # Retrieve messages from the last 24 hours and filter by sender
         since_date = datetime.utcnow() - timedelta(hours=24)
-        messages = ACARSMessage.query.filter(ACARSMessage.timestamp >= since_date, ACARSMessage.sender == sender).all()
+        messages = ACARSMessage.query.filter(ACARSMessage.timestamp >= since_date, ACARSMessage.receiver == sender).all()
 
         formatted_messages = " ".join([
             f"{{{msg.id} {msg.sender} {msg.message_type} {{{msg.packet}}}}}"
