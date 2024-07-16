@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime, timedelta
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///acars.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -96,9 +95,9 @@ def connect():
         return f"ok {formatted_messages}", 200
 
     elif message_type == "peek":
-        # Retrieve messages from the last 24 hours
+        # Retrieve messages from the last 24 hours and filter by sender
         since_date = datetime.utcnow() - timedelta(hours=24)
-        messages = ACARSMessage.query.filter(ACARSMessage.timestamp >= since_date).all()
+        messages = ACARSMessage.query.filter(ACARSMessage.timestamp >= since_date, ACARSMessage.sender == sender).all()
 
         formatted_messages = " ".join([
             f"{{{msg.id} {msg.sender} {msg.message_type} {{{msg.packet}}}}}"
@@ -139,10 +138,6 @@ def dump():
     """
     return render_template_string(table_html, messages=messages)
 
-
-
-
 if __name__ == '__main__':
-
-    print("0.2")
+    print("0.3 fix peek")
     app.run(host='0.0.0.0', port=5050, debug=True)
