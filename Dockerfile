@@ -9,6 +9,7 @@ COPY server.py  /app
 
 # Install any needed packages specified in requirements.txt
 COPY requirements.txt /app 
+COPY authorized_logon.json /app
 
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip3 install -r /app/requirements.txt

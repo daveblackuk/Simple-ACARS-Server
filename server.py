@@ -2,12 +2,19 @@ from flask import Flask, request, jsonify, render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime, timedelta
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///acars.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 CORS(app)  # Enable CORS for all routes
+
+# Load the authorized logon value from the JSON file
+with open('./authorized_logon.json') as f:
+    authorized_logon = json.load(f)['logon']
+
+print(f"Logon:\t{ authorized_logon}")
 
 class ACARSMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -39,7 +46,7 @@ def connect():
     else:
         data = request.args
 
-    logon = " " # data.get('logon')
+    logon = data.get('logon', " ")
     sender = data.get('from')
     receiver = data.get('to')
     message_type = data.get('type')
@@ -47,7 +54,7 @@ def connect():
 
     # Logging the received data for debugging
     print("Received data:")
-#    print(f"logon: {logon}")
+    print(f"logon: {logon}")
     print(f"from: {sender}")
     print(f"to: {receiver}")
     print(f"type: {message_type}")
@@ -57,11 +64,15 @@ def connect():
         missing_fields = [field for field in ['logon', 'from', 'to', 'type'] if not data.get(field)]
         return jsonify({"error": "Missing fields", "missing": missing_fields}), 400
 
+    # Check if the logon value matches the authorized value
+    if logon != authorized_logon:
+        return "error {invalid logon code}", 401
+
     # Normalize fields to uppercase
     sender = sender.upper()
     receiver = receiver.upper()
-  
-    if message_type in ["cpdlc", "telex", "progress","position","posreq","datareq"]:
+
+    if message_type in ["cpdlc", "telex", "progress", "position", "posreq", "datareq"]:
         new_message = ACARSMessage(
             logon=logon,
             sender=sender,
@@ -74,19 +85,19 @@ def connect():
         return "ok", 200
 
     elif message_type == "ping":
-         return f"ok", 200
-    
+        return "ok", 200
+
     elif message_type == "inforeq":
-         return f"not implemented", 200
+        return "not implemented", 200
 
     elif message_type == "poll":
         messages = ACARSMessage.query.filter_by(receiver=sender, read=False).all()
-        
+
         formatted_messages = " ".join([
             f"{{{msg.sender} {msg.message_type} {{{msg.packet}}}}}"
             for msg in messages
         ])
-        
+
         for msg in messages:
             msg.read = True
             db.session.add(msg)
@@ -97,7 +108,10 @@ def connect():
     elif message_type == "peek":
         # Retrieve messages from the last 24 hours and filter by sender
         since_date = datetime.utcnow() - timedelta(hours=24)
-        messages = ACARSMessage.query.filter(ACARSMessage.timestamp >= since_date, ACARSMessage.receiver == sender).all()
+        messages = ACARSMessage.query.filter(
+            ACARSMessage.timestamp >= since_date,
+            ACARSMessage.sender == sender
+        ).all()
 
         formatted_messages = " ".join([
             f"{{{msg.id} {msg.sender} {msg.message_type} {{{msg.packet}}}}}"
@@ -139,5 +153,5 @@ def dump():
     return render_template_string(table_html, messages=messages)
 
 if __name__ == '__main__':
-    print("0.3 fix peek")
+    print("0.2")
     app.run(host='0.0.0.0', port=5050, debug=True)
