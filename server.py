@@ -110,7 +110,7 @@ def connect():
         since_date = datetime.utcnow() - timedelta(hours=24)
         messages = ACARSMessage.query.filter(
             ACARSMessage.timestamp >= since_date,
-            ACARSMessage.receiver == sender
+            ACARSMessage.receiver == receiver
         ).all()
 
         formatted_messages = " ".join([
