@@ -49,7 +49,7 @@ def connect():
     logon = data.get('logon', " ")
     sender = data.get('from')
     receiver = data.get('to')
-    message_type = data.get('type')
+    message_type = data.get('type').lower()
     packet = data.get('packet')
 
     # Logging the received data for debugging
